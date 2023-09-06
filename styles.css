@@ -1,0 +1,24 @@
+:root{
+    background-color: slategrey;
+}
+
+.gameboard{
+    background-color: coral;
+    height: 600px;
+    width: 600px;
+    
+    display: grid;
+    grid-template-rows: repeat(3,1fr);
+}
+
+.gameboard > div {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+}
+.gameboard > div > div {
+    border: 2px solid black;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
