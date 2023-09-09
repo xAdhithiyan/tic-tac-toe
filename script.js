@@ -27,25 +27,40 @@ const gameBoard = function(doc){
 const screenController = function(doc){
     let board = gameBoard.board();
 
+    //holds all the divs that make up the tic-tac-toe board
+    let allGrids = [[],[],[]]
+
+    //adds all the divs that make up tic-tac-toe to allGrids
+    let count = 1;
+    board.forEach(e => {
+        let rows = doc.querySelector(`.row-${count}`)
+        let cols = rows.children; // a nodeList
+        for(let i = 0; i <= 2; i++){
+            allGrids[count - 1].push(cols[i])
+
+        }
+        count++
+    })
+
+    const getallGrids = () => allGrids;
+
     const display = function(){
-        let count = 1;
-        board.forEach(e => {
-            let rows = doc.querySelector(`.row-${count}`)
-            let cols = rows.children; // a nodeList
-            for(let i = 0; i <= 2; i++){
-                cols[i].textContent = board[count - 1][i]
+        for(let i = 0; i < 3; i++){
+            for(let j = 0; j < 3; j++){
+                allGrids[i][j].textContent = board[i][j]
             }
-            count++
-        })
+        }
     }
-
-    const winLoseDisplay = function(winner, val){
-        const div = document.querySelector(".winlose")
-
-        div.textContent = `The winner is ${winner}(${val})`
+    
+    const winLoseDisplay = function(result, winner, val){
+        if(result == "tie" || result == "win"){
+            const div = document.querySelector(".winlose")
+            div.textContent = `The winner is ${winner}(${val})`
+        }
     }
 
     return {
+        getallGrids,
         display,
         winLoseDisplay
     }
@@ -56,31 +71,28 @@ const screenController = function(doc){
 /* the code is repeated but this ensures that the screenController only relies on the gameBoard for the values and not DOM */
 const getPostion = function(doc){
 
-    //adding evenListerns to all the individual boxes -> runs one time
     let board = gameBoard.board();
-    let count = 1;
-    board.forEach(e => {
-        let rows = doc.querySelector(`.row-${count}`)
-        let cols = rows.children; // a nodeList
-        for(let i = 0; i <= 2; i++){
-            cols[i].addEventListener("click" , e => {
-   
-                //when user clicks on a box update the gameboard and display it 
+    let allGrids = screenController.getallGrids();
+
+    //adding evenListerns to all the individual boxes -> runs one time
+    for(let i = 0; i < 3; i++){
+        for(let j = 0; j < 3; j++){
+            allGrids[i][j].addEventListener("click", e => {
+
+                //when user clicks on a box 
                 let row = e.target.parentElement.classList.value.slice(-1) - 1;
                 let col = Array.from(e.target.parentElement.children).indexOf(e.target)
                 if(!board[row][col]){
-                    gameBoard.update(row , col , game.activePlayer().value())
-                    screenController.display()
-                    game.winLose()
+                    gameBoard.update(row , col , game.activePlayer().value()) //update the gameboard 
+                    screenController.display() //update the ui
+                    screenController.winLoseDisplay(game.winLose() , game.activePlayer().name() , game.activePlayer().value()) //checks for win case and displays the ui
+                    game.switchPlayers() //switches the current player
 
-                    // console.log(game.activePlayer().name())
-                    game.switchPlayers()
-                    // console.log(board)
+                    console.log(board)
                 }
             })
         }
-        count++
-    })
+    }
 }(document);
 
 
@@ -111,7 +123,6 @@ const game = function(){
     const activePlayer = () => currentPlayer
 
     const winLose = function(){
-        
         let tieCount = 0
         // to check for tie
         board.forEach((e) => {
@@ -122,21 +133,23 @@ const game = function(){
             })
         })
         if(tieCount == 9){
-            screenController.winLoseDisplay("no one", "tie")
+            return "tie"
         }
         for(let i = 0; i < 3; i++){
-            if(board[0][i] != 0 && board[1][i] != 0 && board[2][i] != 0 || board[i][0] != 0 && board[i][1] != 0 && board[i][2] != 0){
+            if(board[0][i] != "" && board[1][i] != "" && board[2][i] != "" || board[i][0] != "" && board[i][1] != "" && board[i][2] != ""){
                 //check for single row and column win
                 if(board[0][i] == board[1][i] && board[1][i] == board[2][i] || board[i][0] == board[i][1] && board[i][1] == board[i][2]){
-                    screenController.winLoseDisplay(activePlayer().name() , activePlayer().value())
+                    return "win" 
                 }
-                //checks for diagonal win
-                else if(board[0][0] == board[1][1] && board[1][1] == board[2][2] || board[0][2] == board[1][1] && board[1][1] == board[2][0]){
-                    screenController.winLoseDisplay(activePlayer().name() , activePlayer().value())
-                } 
             }
-        }   
-        return "lost"
+            //checks for diagonal win
+            if(board[0][0] != "" && board[1][1] != "" && board[2][2] != "" || board[0][2] != "" && board[0][2] != "" && board[1][1] != "" && board[2][0] != "" ){
+                if(board[0][0] == board[1][1] && board[1][1] == board[2][2] || board[0][2] == board[1][1] && board[1][1] == board[2][0]){
+                    return "win"
+                }
+            }
+        }
+        return "lose"       
     }
 
     return{
