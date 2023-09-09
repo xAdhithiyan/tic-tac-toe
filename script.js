@@ -3,8 +3,8 @@
 /* Module pattern since only one gameBoard(an object) is needed */
 const gameBoard = function(doc){
     let gameboard = [
-        ["a","b","c"],
-        ["d","x","f"],
+        ["","",""],
+        ["","",""],
         ["","",""]
     ]
     
@@ -12,7 +12,7 @@ const gameBoard = function(doc){
     const board = () => gameboard
 
     //to update the value
-    const update = function(row, col, val = "x"){
+    const update = function(row, col, val){
         gameboard[row][col] = val
     }
     
@@ -37,7 +37,6 @@ const screenController = function(doc){
             }
             count++
         })
-        console.log("hi")
     }
 
     return {
@@ -46,7 +45,7 @@ const screenController = function(doc){
 }(document);
 
 
-/* to get the positon of the box that the user clicks */
+/* to get the positon of the box that the user clicks and add certain function to it*/
 /* the code is repeated but this ensures that the screenController only relies on the gameBoard for the values and not DOM */
 const getPostion = function(doc){
 
@@ -58,13 +57,16 @@ const getPostion = function(doc){
         let cols = rows.children; // a nodeList
         for(let i = 0; i <= 2; i++){
             cols[i].addEventListener("click" , e => {
-                if(!e.target.textContent){
-                    
-                    //when user clicks on a box update the gameboard and display it 
-                    let rows = e.target.parentElement.classList.value.slice(-1) - 1;
-                    let cols = Array.from(e.target.parentElement.children).indexOf(e.target)
-                    gameBoard.update(rows , cols)
+   
+                //when user clicks on a box update the gameboard and display it 
+                let row = e.target.parentElement.classList.value.slice(-1) - 1;
+                let col = Array.from(e.target.parentElement.children).indexOf(e.target)
+                if(!board[row][col]){
+                    gameBoard.update(row , col , game.activePlayer().value())
                     screenController.display()
+                    console.log(game.activePlayer().name())
+                    game.switchPlayers()
+                    console.log(board)
                 }
             })
         }
@@ -75,17 +77,34 @@ const getPostion = function(doc){
 
 
 /* factory function since more then one player is needed */
-const Player = function(name){
-    const display = function() {
-        console.log(name)
-    }
-
+const Player = function(fname , fvalue){
+    const name = () => fname
+    const value = () => fvalue
     return {
-        display
+        name,
+        value
+
     }
 }   
 
 
+/* controls the flow of the game */
+const game = function(){
+    const player1 = Player("john" , "o")
+    const player2 = Player("Max" , "x")
+    let currentPlayer = player2
+    
+    const switchPlayers = function() {
+        currentPlayer = currentPlayer.value() == "x" ?  player1 : player2
+    }
 
-const player1 = Player("player1")
-screenController.display()
+    const activePlayer = () => currentPlayer
+
+    return{
+        switchPlayers,
+        activePlayer
+    } 
+
+}();
+
+screenController.display()  
