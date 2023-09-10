@@ -1,24 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
 :root{
     background-color: slategrey;
+    font-family: 'IBM Plex Sans', sans-serif;
+    --main-color:#5F4B8BFF; 
 }
 
-.gameboard{
-    background-color: coral;
-    height: 600px;
-    width: 600px;
-    
+body{
+    height: 100vh;
+    background-color: #1C1C1BFF; 
     display: grid;
-    grid-template-rows: repeat(3,1fr);
+    justify-items: center;
+    grid-template-rows: auto auto 40px 1fr 32px;
+    overflow: hidden;
+}
+h1{
+    color: var(--main-color);
+    font-size: 3.5rem;
+    margin: 0px;
+    padding: 20px;
+    text-align: center;
 }
 
-.gameboard > div {
+hr{
+    width: 60%;
+    border-color: slategrey;
+}
+.gameboard{
+    height: 450px;
+    width: 450px;
+    display: grid;
+    grid-template-rows: repeat(3,1fr);  
+    align-self: center;
+}
+.pre-gameboard{
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+    align-items: center;
+}
+
+.gameboard >  div {
     display: grid;
     grid-template-columns: repeat(3,1fr);
 }
 .gameboard > div > div {
-    border: 2px solid black;
-
+    box-sizing: border-box;
+    color: var(--main-color);
     display: flex;
     justify-content: center;
-    align-items: center;
+    font-size: 100px;
 }
+.row-1, 
+.row-2{
+    border-bottom: 2px solid var(--main-color);
+}
+.gameboard > div > div:nth-child(1),
+.gameboard > div > div:nth-child(2){
+    border-right: 2px solid var(--main-color);
+}
+.winlose{
+    color: var(--main-color);
+    font-size: 2rem;
+    margin:20px;
+}
+.footer{
+    color: var(--main-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font: 1.2rem;
+}
+img{
+    height: 30px;
+    width: 32px;
+
+}
+img:hover{
+    transform: rotate(360deg);
+    transition-duration: 0.5s;
+    height: 32px;
+}
+
+.reset{
+    width: 130px;
+    height: 60px;
+    justify-self: center;
+    background-color: var(--main-color);
+    border: 2px solid black;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    color: black;
+}
+
+@media only screen and (max-height: 820px) {
+    .gameboard{
+        height: 350px;
+        width: 350px;
+    }
+    .gameboard > div > div{
+        display: flex;
+        justify-content: center;
+        font-size: 80px;
+
+    }
+  }

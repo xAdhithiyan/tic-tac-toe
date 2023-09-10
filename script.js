@@ -1,7 +1,7 @@
 /* sperate ui and logic */
 
 /* Module pattern since only one gameBoard(an object) is needed */
-const gameBoard = function(doc){
+const gameBoard = function(){
     let gameboard = [
         ["","",""],
         ["","",""],
@@ -100,7 +100,7 @@ const gameBoardEventListerner = function(e){
 
 /* to get the positon of the box that the user clicks and add certain function to it*/
 /*  ensures that the screenController only relies on the gameBoard for the values and not DOM */
-const getPostion = function(doc){
+const getPostion = function(){
     let allGrids = screenController.getallGrids();
 
     //adding evenListerns to all the individual boxes -> runs one time
@@ -109,7 +109,7 @@ const getPostion = function(doc){
             allGrids[i][j].addEventListener("click", gameBoardEventListerner)
         }
     }
-}(document);
+}();
 
 
 
