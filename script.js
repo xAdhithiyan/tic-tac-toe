@@ -53,44 +53,60 @@ const screenController = function(doc){
     }
     
     const winLoseDisplay = function(result, winner, val){
-        if(result == "tie" || result == "win"){
-            const div = document.querySelector(".winlose")
-            div.textContent = `The winner is ${winner}(${val})`
+        const div = document.querySelector(".winlose")
+        if(result == "win"){
+            div.textContent = `${winner}(${val}) wins`
+        }else if(result == "tie"){
+            div.textContent = "Tie"
         }
+    }
+
+    const currentPlayerDisplay = function(){
+        const div = document.querySelector(".winlose")
+        console.log(game.activePlayer())
+        div.textContent = `${game.activePlayer().name()}(${game.activePlayer().value()})'s turn`
     }
 
     return {
         getallGrids,
         display,
-        winLoseDisplay
+        winLoseDisplay,
+        currentPlayerDisplay
     }
 }(document);
 
 
-/* to get the positon of the box that the user clicks and add certain function to it*/
-/* the code is repeated but this ensures that the screenController only relies on the gameBoard for the values and not DOM */
-const getPostion = function(doc){
-
+//event listener function for the game board boxes
+const gameBoardEventListerner = function(e){
     let board = gameBoard.board();
+    //when user clicks on a box 
+    let row = e.target.parentElement.classList.value.slice(-1) - 1;
+    let col = Array.from(e.target.parentElement.children).indexOf(e.target)
+    if(!board[row][col]){
+        gameBoard.update(row , col , game.activePlayer().value()) //update the gameboard 
+        screenController.display() //update the gameboard ui
+        game.switchPlayers() //switches the current player
+        screenController.currentPlayerDisplay() //displays the next player to play
+        if(game.winLose() == "win" || game.winLose() == "tie"){
+            game.switchPlayers()
+            screenController.winLoseDisplay(game.winLose() , game.activePlayer().name() , game.activePlayer().value()) //checks for win case and displays the winner
+        }
+    
+        console.log(board)
+    }
+}
+
+
+
+/* to get the positon of the box that the user clicks and add certain function to it*/
+/*  ensures that the screenController only relies on the gameBoard for the values and not DOM */
+const getPostion = function(doc){
     let allGrids = screenController.getallGrids();
 
     //adding evenListerns to all the individual boxes -> runs one time
     for(let i = 0; i < 3; i++){
         for(let j = 0; j < 3; j++){
-            allGrids[i][j].addEventListener("click", e => {
-
-                //when user clicks on a box 
-                let row = e.target.parentElement.classList.value.slice(-1) - 1;
-                let col = Array.from(e.target.parentElement.children).indexOf(e.target)
-                if(!board[row][col]){
-                    gameBoard.update(row , col , game.activePlayer().value()) //update the gameboard 
-                    screenController.display() //update the ui
-                    screenController.winLoseDisplay(game.winLose() , game.activePlayer().name() , game.activePlayer().value()) //checks for win case and displays the ui
-                    game.switchPlayers() //switches the current player
-
-                    console.log(board)
-                }
-            })
+            allGrids[i][j].addEventListener("click", gameBoardEventListerner)
         }
     }
 }(document);
@@ -123,6 +139,7 @@ const game = function(){
     const activePlayer = () => currentPlayer
 
     const winLose = function(){
+        let allGrids = screenController.getallGrids();
         let tieCount = 0
         // to check for tie
         board.forEach((e) => {
@@ -136,15 +153,25 @@ const game = function(){
             return "tie"
         }
         for(let i = 0; i < 3; i++){
+            //check for single row and column win
             if(board[0][i] != "" && board[1][i] != "" && board[2][i] != "" || board[i][0] != "" && board[i][1] != "" && board[i][2] != ""){
-                //check for single row and column win
                 if(board[0][i] == board[1][i] && board[1][i] == board[2][i] || board[i][0] == board[i][1] && board[i][1] == board[i][2]){
+                    for(let j = 0; j < 3; j++){
+                        for(let k = 0; k < 3; k++){
+                            allGrids[j][k].removeEventListener("click", gameBoardEventListerner )
+                        }
+                    }
                     return "win" 
                 }
             }
             //checks for diagonal win
             if(board[0][0] != "" && board[1][1] != "" && board[2][2] != "" || board[0][2] != "" && board[0][2] != "" && board[1][1] != "" && board[2][0] != "" ){
                 if(board[0][0] == board[1][1] && board[1][1] == board[2][2] || board[0][2] == board[1][1] && board[1][1] == board[2][0]){
+                    for(let j = 0; j < 3; j++){
+                        for(let k = 0; k < 3; k++){
+                            allGrids[j][k].removeEventListener("click", gameBoardEventListerner)
+                        }
+                    }
                     return "win"
                 }
             }
