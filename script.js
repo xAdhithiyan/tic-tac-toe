@@ -52,19 +52,21 @@ const screenController = function(doc){
         }
     }
     
-    const winLoseDisplay = function(result, winner, val){
+    const winLoseDisplay = function(result, val){
         const div = document.querySelector(".winlose")
-        if(result == "win"){
-            div.textContent = `${winner}(${val}) wins`
-        }else if(result == "tie"){
+        if(result[3] == "win"){
+            div.textContent = `${val.toUpperCase()} wins`
+            for(let i = 0; i < 3; i++){
+                allGrids[result[i][0]][result[i][1]].classList.add("winColor")
+            }
+        }else if(result[0] == "tie"){
             div.textContent = "Tie"
         }
     }
 
     const currentPlayerDisplay = function(){
         const div = document.querySelector(".winlose")
-        console.log(game.activePlayer())
-        div.textContent = `${game.activePlayer().name()}(${game.activePlayer().value()})'s turn`
+        div.textContent = `${game.activePlayer().value().toUpperCase()}'s turn`
     }
 
     return {
@@ -87,9 +89,9 @@ const gameBoardEventListerner = function(e){
         screenController.display() //update the gameboard ui
         game.switchPlayers() //switches the current player
         screenController.currentPlayerDisplay() //displays the next player to play
-        if(game.winLose() == "win" || game.winLose() == "tie"){
+        if(game.winLose()[3] == "win" || game.winLose()[0] == "tie"){
             game.switchPlayers()
-            screenController.winLoseDisplay(game.winLose() , game.activePlayer().name() , game.activePlayer().value()) //checks for win case and displays the winner
+            screenController.winLoseDisplay(game.winLose(), game.activePlayer().value()) //checks for win case and displays the winner
         }
     
         console.log(board)
@@ -109,16 +111,20 @@ const getPostion = function(){
             allGrids[i][j].addEventListener("click", gameBoardEventListerner)
         }
     }
+
+    //reset button
+    const btn = document.querySelector(".reset")
+    btn.addEventListener("click", () => {
+        window.location.reload(false);
+    })
 }();
 
 
 
 /* factory function since more then one player is needed */
-const Player = function(fname , fvalue){
-    const name = () => fname
+const Player = function(fvalue){
     const value = () => fvalue
     return {
-        name,
         value
 
     }
@@ -128,8 +134,8 @@ const Player = function(fname , fvalue){
 /* controls the flow of the game */
 const game = function(){
     let board = gameBoard.board()
-    const player1 = Player("john" , "o")
-    const player2 = Player("Max" , "x")
+    const player1 = Player("o")
+    const player2 = Player("x")
     let currentPlayer = player2
     
     const switchPlayers = function() {
@@ -150,7 +156,7 @@ const game = function(){
             })
         })
         if(tieCount == 9){
-            return "tie"
+            return ["tie"]
         }
         for(let i = 0; i < 3; i++){
             //check for single row and column win
@@ -161,7 +167,16 @@ const game = function(){
                             allGrids[j][k].removeEventListener("click", gameBoardEventListerner )
                         }
                     }
-                    return "win" 
+
+                    //to return the win condition boxes
+                    let ans
+                    if(board[0][i] == board[1][i] && board[1][i] == board[2][i]){
+                        ans = [`0${i}`, `1${i}`,`2${i}`]                         
+                    }else{
+                        ans = [`${i}0`, `${i}1`,`${i}2`]   
+                    }
+                    ans.push("win")
+                    return ans
                 }
             }
             //checks for diagonal win
@@ -172,17 +187,26 @@ const game = function(){
                             allGrids[j][k].removeEventListener("click", gameBoardEventListerner)
                         }
                     }
-                    return "win"
+
+                    //to return the win condition boxes
+                    let ans
+                    if(board[0][0] == board[1][1] && board[1][1] == board[2][2]){
+                        ans = ["00", "11", "22"]                         
+                    }else{
+                        ans = ["02", "11", "20"]   
+                    }
+                    ans.push("win")
+                    return ans
                 }
             }
         }
-        return "lose"       
+        return ["lose"]      
     }
-
+    
     return{
         switchPlayers,
         activePlayer,
-        winLose
+        winLose,
     } 
 
 }();

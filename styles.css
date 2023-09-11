@@ -50,6 +50,17 @@ hr{
     display: flex;
     justify-content: center;
     font-size: 100px;
+
+}
+.gameboard > div > div:hover {
+    background-color: rgba(128, 128, 128, 0.1);
+    /* border-radius: 10px; */
+} 
+
+.winColor,
+.gameboard > div > div.winColor:hover{
+    background-color: rgba(44, 238, 144, 0.1);
+    transition: 1s;
 }
 .row-1, 
 .row-2{
