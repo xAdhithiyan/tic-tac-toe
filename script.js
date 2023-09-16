@@ -147,17 +147,7 @@ const game = function(){
     const winLose = function(){
         let allGrids = screenController.getallGrids();
         let tieCount = 0
-        // to check for tie
-        board.forEach((e) => {
-            e.forEach(box => {
-                if (box != ""){
-                    tieCount++
-                } 
-            })
-        })
-        if(tieCount == 9){
-            return ["tie"]
-        }
+
         for(let i = 0; i < 3; i++){
             //check for single row and column win
             if(board[0][i] != "" && board[1][i] != "" && board[2][i] != "" || board[i][0] != "" && board[i][1] != "" && board[i][2] != ""){
@@ -199,6 +189,17 @@ const game = function(){
                     return ans
                 }
             }
+        }
+        // to check for tie
+        board.forEach((e) => {
+            e.forEach(box => {
+                if (box != ""){
+                    tieCount++
+                } 
+            })
+        })
+        if(tieCount == 9){
+            return ["tie"]
         }
         return ["lose"]      
     }
